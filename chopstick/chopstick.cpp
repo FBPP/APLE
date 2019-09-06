@@ -30,13 +30,19 @@ class Semaphore{
 		}
 };
 
+class Phier;
+struct wrapper{
+	int i;
+	Phier * p;
+};
+
 class Phier{
 	private:
 		Semaphore mutex[N];
 		pthread_t thread[N];
-		int num;
+		wrapper wp[N];
 	public :
-		Phier():num(0)
+		Phier()
 		{
 			thread_create();
 			thread_wait();
@@ -46,7 +52,8 @@ class Phier{
 			int tmp;
 			for(int i = 0; i < N; i++)
 			{
-				tmp = pthread_create(&thread[i], NULL, solve, this);
+				wp[i].i = i, wp[i].p = this;
+				tmp = pthread_create(&thread[i], NULL, solve, &wp[i]);
 				if(tmp)
 					printf("th %d create fail\n", i);
 			}
@@ -61,18 +68,18 @@ class Phier{
 
 		}
 		static void * solve(void * arg){
-			Phier * _this = (Phier *) arg;
-			_this->run();
+			wrapper * wp = (wrapper *)arg;
+			wp->p->run(wp->i);
 		}
-		void run ()
+		void run (int i)
 		{
-			int left = num;
-			int right = (num + 1) % N;
-				if(num % 2 == 0)
+			int left = i;
+			int right = (i + 1) % N;
+				if(i % 2 == 0)
 				{
 					 mutex[left].P();
 					 mutex[right].P();
-					 printf("phi %d eat\n", ++num);
+					 printf("phi %d eat\n", i);
 					 mutex[right].V();
 					 mutex[left].V();
 				}
@@ -80,7 +87,7 @@ class Phier{
 				{
 					 mutex[right].P();
 					 mutex[left].P();
-					 printf("phi %d eat\n", ++num);
+					 printf("phi %d eat\n", i);
 					 mutex[left].V();
 					 mutex[right].V();
 				}
