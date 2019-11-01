@@ -1,4 +1,14 @@
-# 序章：进程相关概念
+# 第3章: 文件I/O
+### open 和 opoenat
+```
+int open(const char *pathname. int flags);
+int open(const char *pathname, int flags, mode_t mode);
+
+int openat(int dirfd, const char *pathname, int flages);
+int openat(int dirfd, const char *pathname, int flages, mode_t mode);
+```
+
+
 ### 1、程序和进程
 + 程序是文件，在磁盘中
 + 进程是活跃的程序，在内存中
